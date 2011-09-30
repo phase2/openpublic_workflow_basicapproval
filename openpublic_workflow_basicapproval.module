@@ -1,1 +1,7 @@
 <?php
+/**
+ * @file
+ * Code for the OpenPublic Workflow Basic Approval feature.
+ */
+
+include_once('openpublic_workflow_basicapproval.features.inc');
