@@ -1,0 +1,8 @@
+name="OpenPublic Workflow (Basic Approval)"
+description="Basic workflow"
+core=7.x
+dependencies[] = "workbench"
+dependencies[] = "workbench_access"
+dependencies[] = "workbench_moderation"
+apps[server] = "development"
+apps[manifests][] = "app/manifest.app"
