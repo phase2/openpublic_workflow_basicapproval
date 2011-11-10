@@ -4,4 +4,6 @@ core = "7.x"
 dependencies[] = "workbench"
 dependencies[] = "workbench_moderation"
 description = "Enable basic approval workflow based on workbench"
+apps[server] = "development"
+apps[manifests][] = "app/manifest.app"
 
