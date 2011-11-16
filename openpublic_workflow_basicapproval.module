@@ -4,3 +4,44 @@
  * Code for the OpenPublic Workflow Basic Approval feature.
  */
 
+function openpublic_workflow_basicapproval_menu() {
+  return array(
+    'admin/config/workbench/moderation/transitions/defaults' => array(
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('openpublic_workflow_basicapproval_set_permissions'),
+      'access arguments' => array('administer workbench moderation'),
+      'type' => MENU_CALLBACK,
+    ),
+  );
+}
+
+function openpublic_workflow_basicapproval_set_permissions($form, $form_state) {
+  return confirm_form($form, t('Are you sure you want to assign default permissions?'), drupal_get_destination());
+}
+
+function openpublic_workflow_basicapproval_set_permissions_submit($form, $form_state) {
+  $roles = user_roles();
+  $transitions = workbench_moderation_transitions();
+
+  foreach ($roles as $rid => $name) {
+    $permissions = array(); 
+    if ($name == 'editor') {
+      $permissions[] = 'use workbench_moderation my drafts tab';
+      $permissions[] = 'use workbench_moderation needs review tab';
+      // Add all state transitions for editors
+      foreach ($transitions as $transition) {
+        $from_state = $transition->from_name;
+        $to_state = $transition->to_name;
+
+        // Always set a permission to perform all moderation states.
+        $permissions[] = "moderate content from $from_state to $to_state";
+      }
+    } elseif ($name == 'staff') {
+      $permissions[] = 'use workbench_moderation my drafts tab';
+      $permissions[] = 'moderate content from draft to needs_review';
+    }
+    if (count($permissions)) {
+      user_role_grant_permissions($rid, $permissions);
+    }
+  }
+}
