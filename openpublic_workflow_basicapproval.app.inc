@@ -15,28 +15,7 @@ function openpublic_workflow_basicapproval_apps_app_info() {
  * Configuration form for workflow app
  */
 function openpublic_workflow_basicapproval_status() {
-  return array(
-    'items' => array(
-      'perm' => array(
-        'status'=> REQUIREMENT_OK,
-        'title' =>  t('Assign moderation permissions'),
-        'description' =>  t('To make the most of workflow settings, permissions should be enabled to allow appropriate roles the control to move between workflow states.'),
-        'actions' => array(l('Add default permissions', 'admin/config/workbench/moderation/transitions/defaults', array('query' => drupal_get_destination()))),
 
-      ),
-    ),
-  );
-}
-/**
- * Configuration form for workflow app
- */
-function openpublic_workflow_basicapproval_configure($form, $form_state) {
-  $form = array();
-
-  $form['setup'] = array(
-    '#type' => 'fieldset',
-    '#title' => 'Workflow Setup',
-  );
 
   $roles = user_roles();
   // exclude anonymous & admin
@@ -48,28 +27,26 @@ function openpublic_workflow_basicapproval_configure($form, $form_state) {
     ->condition('module', 'workbench_moderation', '=')
     ->condition('rid', array_keys($roles), 'IN')
     ->countQuery()->execute()->fetchField();
-  
-  $form['setup']['table'] = array(
-    '#theme' => 'table',
-    '#header' => array('Status', 'Step', 'Instructions', 'Action'),
-    '#rows' => array(
+ 
+
+  return array(
+    'items' => array(
       'perm' => array(
-        'data' => array(
-          theme('image', array('path' => 'misc/watchdog-ok.png', 'alt' => 'OK')),
-          t('Assign moderation permissions'),
-          t('To make the most of workflow settings, permissions should be enabled to allow appropriate roles the control to move between workflow states.'),
-          l('Add default permissions', 'admin/config/workbench/moderation/transitions/defaults', array('query' => drupal_get_destination())),
-        ),
+        'severity'=> ($assigned_count == 0) ? REQUIREMENT_WARNING : REQUIREMENT_OK,
+        'title' =>  t('Assign moderation permissions'),
+        'description' =>  t('To make the most of workflow settings, permissions should be enabled to allow appropriate roles the control to move between workflow states.'),
+        'action' => array(l('Add default permissions', 'admin/config/workbench/moderation/transitions/defaults', array('query' => drupal_get_destination()))),
+
       ),
     ),
   );
+}
+/**
+ * Configuration form for workflow app
+ */
+function openpublic_workflow_basicapproval_configure($form, $form_state) {
+  $form = array();
 
-  if ($assigned_count == 0) {
-    $form['setup']['table']['#rows']['perm']['data']['0'] = theme("image", array("path" => "misc/watchdog-warning.png", "alt"=>"Warning"));
-    $form['setup']['table']['#rows']['perm']['class'][] = 'warning';
-  }
-  
-  
   $form['enabled'] = array(
     '#type' => 'fieldset',
     '#title' => 'Content Types for Workflow',
@@ -91,11 +68,13 @@ function openpublic_workflow_basicapproval_configure($form, $form_state) {
     '#default_value' => $types_selected,
   );
 
-  $form['submit'] = array(
+  $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Save',
   );
-  
+  $form = system_settings_form($form); 
+  //we want to control our submit
+  $form['#submit'] = array('openpublic_workflow_basicapproval_configure_submit');
   return $form;
 }
 
