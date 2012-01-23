@@ -6,9 +6,27 @@
 function openpublic_workflow_basicapproval_apps_app_info() {
   return array(
     'configure form' => 'openpublic_workflow_basicapproval_configure',
+    'status callback' => 'openpublic_workflow_basicapproval_status',
   );
 }
 
+
+/**
+ * Configuration form for workflow app
+ */
+function openpublic_workflow_basicapproval_status() {
+  return array(
+    'items' => array(
+      'perm' => array(
+        'status'=> REQUIREMENT_OK,
+        'title' =>  t('Assign moderation permissions'),
+        'description' =>  t('To make the most of workflow settings, permissions should be enabled to allow appropriate roles the control to move between workflow states.'),
+        'actions' => array(l('Add default permissions', 'admin/config/workbench/moderation/transitions/defaults', array('query' => drupal_get_destination()))),
+
+      ),
+    ),
+  );
+}
 /**
  * Configuration form for workflow app
  */
