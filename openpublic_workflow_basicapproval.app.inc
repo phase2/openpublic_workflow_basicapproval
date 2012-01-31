@@ -27,7 +27,9 @@ function openpublic_workflow_basicapproval_status() {
     ->condition('module', 'workbench_moderation', '=')
     ->condition('rid', array_keys($roles), 'IN')
     ->countQuery()->execute()->fetchField();
- 
+
+
+  $access_configured = variable_get('workbench_access_taxonomy', FALSE);
 
   return array(
     'items' => array(
@@ -36,11 +38,17 @@ function openpublic_workflow_basicapproval_status() {
         'title' =>  t('Assign moderation permissions'),
         'description' =>  t('To make the most of workflow settings, permissions should be enabled to allow appropriate roles the control to move between workflow states.'),
         'action' => array(l('Add default permissions', 'admin/config/workbench/moderation/transitions/defaults', array('query' => drupal_get_destination()))),
-
+      ),
+      'access' => array(
+        'severity' => ($access_configured) ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+        'title' => t('Configure access controls'),
+        'description' => t('To enable workflow access, a sections vocabulary needs to be created and roles/users assigned to sections.'),
+        'action' => array(l('Create sections', 'admin/config/workbench/access/create', array('query' => drupal_get_destination()))),
       ),
     ),
   );
 }
+
 /**
  * Configuration form for workflow app
  */

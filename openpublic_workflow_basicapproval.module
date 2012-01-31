@@ -12,6 +12,12 @@ function openpublic_workflow_basicapproval_menu() {
       'access arguments' => array('administer workbench moderation'),
       'type' => MENU_CALLBACK,
     ),
+    'admin/config/workbench/access/create' => array(
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('openpublic_workflow_basicapproval_access_create'),
+      'access arguments' => array('administer workbench access'),
+      'type' => MENU_CALLBACK,
+    ),
   );
 }
 
@@ -44,4 +50,57 @@ function openpublic_workflow_basicapproval_set_permissions_submit($form, $form_s
       user_role_grant_permissions($rid, $permissions);
     }
   }
+}
+
+function openpublic_workflow_basicapproval_access_create($form, $form_state) {
+  return confirm_form($form, t('Are you sure you want to assign default permissions?'), drupal_get_destination());
+}
+
+function openpublic_workflow_basicapproval_access_create_submit($form, $form_state) {
+  module_load_include('inc', 'workbench_access', 'workbench_access.admin');
+  
+  $vocabulary = openpublic_workflow_basicapproval_vocabulary();
+  $exists = workbench_access_vocabulary_exists($vocabulary);
+  if ($exists) {
+    return;
+  }
+  taxonomy_vocabulary_save($vocabulary);
+
+  // Set our vocabulary as the default.
+  variable_set('workbench_access_taxonomy', array($vocabulary->machine_name => $vocabulary->machine_name));
+  // Set taxonomy as the active scheme.
+  variable_set('workbench_access', 'taxonomy');
+
+  // Give the admin account access to all sections.
+  workbench_access_user_section_save(1, 'workbench_access', 'taxonomy');
+
+  // Get all nodes and save them to {workbench_access_node}.
+  $nids = db_query("SELECT nid FROM {node}")->fetchAll();
+  $values = array();
+  foreach ($nids as $nid) {
+    $values[] = array(
+      'nid' => $nid->nid,
+      'access_id' => 'workbench_access',
+      'access_scheme' => 'taxonomy',
+    );
+  }
+  if (empty($values)) {
+    return;
+  }
+  $query = db_insert('workbench_access_node')->fields(array('nid', 'access_id', 'access_scheme'));
+  foreach ($values as $record) {
+    $query->values($record);
+  }
+  $query->execute();
+}
+
+function openpublic_workflow_basicapproval_vocabulary() {
+  $vocabulary = new stdClass();
+  $vocabulary->name = $t('Sections');
+  $vocabulary->module = 'workbench_access';
+  $vocabulary->machine_name = 'workbench_access';
+  $vocabulary->description = $t('Access control for editorial content.');
+  $vocabulary->hierarchy = 1;
+  $vocabulary->weight = -10;
+  return $vocabulary;
 }
