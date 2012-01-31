@@ -10,6 +10,8 @@ screenshots[] = screenshot.jpg
 
 dependencies[workbench] = workbench 1.0
 dependencies[workbench_moderation] = workbench_moderation 1.1
+dependencies[workbench_access] = workbench_moderation 1.0
 
 downloadables[workbench 1.0] = http://ftp.drupal.org/files/projects/workbench-7.x-1.0.tar.gz
 downloadables[workbench_moderation 1.1] = http://ftp.drupal.org/files/projects/workbench_moderation-7.x-1.1.tar.gz
+downloadables[workbench_access 1.0] = http://ftp.drupal.org/files/projects/workbench_access-7.x-1.0.tar.gz
