@@ -96,10 +96,10 @@ function openpublic_workflow_basicapproval_access_create_submit($form, $form_sta
 
 function openpublic_workflow_basicapproval_vocabulary() {
   $vocabulary = new stdClass();
-  $vocabulary->name = $t('Sections');
+  $vocabulary->name = t('Sections');
   $vocabulary->module = 'workbench_access';
   $vocabulary->machine_name = 'workbench_access';
-  $vocabulary->description = $t('Access control for editorial content.');
+  $vocabulary->description = t('Access control for editorial content.');
   $vocabulary->hierarchy = 1;
   $vocabulary->weight = -10;
   return $vocabulary;
