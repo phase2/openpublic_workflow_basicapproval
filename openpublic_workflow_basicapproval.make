@@ -1,4 +1,5 @@
 core = 7.x
+api = 2
 projects[workbench][version] = 1.1
 projects[workbench_moderation][version] = 1.1
 projects[workbench_moderation][patch][] = http://drupal.org/files/workbench_moderation-redirect_form-1515110.patch
